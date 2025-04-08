@@ -1,19 +1,586 @@
-<!doctype html>
-<html>
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width" />
-		<title>My static Space</title>
-		<link rel="stylesheet" href="style.css" />
-	</head>
-	<body>
-		<div class="card">
-			<h1>Welcome to your static Space!</h1>
-			<p>You can modify this app directly by editing <i>index.html</i> in the Files and versions tab.</p>
-			<p>
-				Also don't forget to check the
-				<a href="https://huggingface.co/docs/hub/spaces" target="_blank">Spaces documentation</a>.
-			</p>
-		</div>
-	</body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refnaldy Ivan - CV & Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            overflow-x: hidden;
+        }
+        
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        }
+        
+        .card {
+            backdrop-filter: blur(10px);
+            background-color: rgba(26, 32, 44, 0.7);
+            border: 1px solid rgba(74, 85, 104, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .section-title {
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+            border-radius: 3px;
+        }
+        
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .portfolio-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .portfolio-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .portfolio-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .portfolio-item:hover .portfolio-overlay {
+            opacity: 1;
+        }
+        
+        .skill-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+        
+        .skill-progress {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+            transition: width 1s ease-in-out;
+        }
+        
+        .mode-switch {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+        
+        .profile-img {
+            border: 3px solid transparent;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%) border-box;
+            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: destination-out;
+            mask-composite: exclude;
+        }
+        
+        .social-icon {
+            transition: all 0.3s ease;
+        }
+        
+        .social-icon:hover {
+            transform: translateY(-3px);
+        }
+        
+        .filter-btn {
+            transition: all 0.3s ease;
+            min-width: 100px;
+        }
+        
+        .filter-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .active-filter {
+            background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%) !important;
+        }
+    </style>
+</head>
+<body class="text-gray-200">
+    <!-- Particles Background -->
+    <div id="particles-js"></div>
+    
+    <div class="mode-switch flex space-x-4">
+        <button id="viewToggle" class="p-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg hover:shadow-xl transition-all">
+            <span id="viewText" class="font-medium">Portfolio Mode</span>
+        </button>
+    </div>
+
+    <div class="container mx-auto px-4 py-12 relative">
+        <!-- CV Mode (Default) -->
+        <div id="cvMode" class="space-y-8">
+            <header class="text-center mb-12">
+                <div class="flex justify-center mb-4">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile" class="w-32 h-32 rounded-full object-cover profile-img">
+                </div>
+                <h1 class="text-4xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">Refnaldy Ivan</h1>
+                <p class="text-xl text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 font-medium">IT Support / Helpdesk / Graphic Designer</p>
+                <div class="flex justify-center space-x-4 mt-4">
+                    <a href="#" class="social-icon text-gray-300 hover:text-blue-400 text-xl"><i class="fab fa-github"></i></a>
+                    <a href="#" class="social-icon text-gray-300 hover:text-blue-400 text-xl"><i class="fab fa-linkedin"></i></a>
+                    <a href="#" class="social-icon text-gray-300 hover:text-blue-400 text-xl"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-icon text-gray-300 hover:text-blue-400 text-xl"><i class="fab fa-instagram"></i></a>
+                </div>
+            </header>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="md:col-span-2 space-y-8">
+                    <section class="card p-6 rounded-lg shadow-lg">
+                        <h2 class="section-title text-2xl font-bold mb-6">About Me</h2>
+                        <p class="text-gray-300 leading-relaxed">
+                            Experienced IT Support professional with 5 years in a Network Operation Center (NOC), known for being a hard worker, fast 
+                            learner, and effective team player with prompt client response. Gained 2 years of graphic design experience at a branding 
+                            agency, creating social media content and collaborating on marketing strategies. Additionally, I have product sourcing 
+                            experience with a U.S company, achieving high profit margins and strict quality standards. Currently seeking new 
+                            opportunities to grow and develop skills.
+                        </p>
+                    </section>
+
+                    <section class="card p-6 rounded-lg shadow-lg">
+                        <h2 class="section-title text-2xl font-bold mb-6">Experience</h2>
+                        <div class="space-y-8">
+                            <div class="relative pl-8 border-l-2 border-blue-500/30">
+                                <div class="absolute -left-2 top-0 w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-600"></div>
+                                <h3 class="text-xl font-semibold">IT Support / Helpdesk</h3>
+                                <p class="text-blue-400 mb-3">PT. Dhecyber Flow Indonesia • 2018 - 2023</p>
+                                <ul class="list-disc pl-5 text-gray-300 space-y-2">
+                                    <li>Supervised the installation of networking infrastructure at over 50 client offices, ensuring efficient setup and operation.</li>
+                                    <li>Provided weekly updates about ongoing projects, maintaining transparency and alignment with stakeholders.</li>
+                                    <li>Held regular meetings with clients to discuss project progress, milestones, and expectations, resulting in a 25% increase in client satisfaction.</li>
+                                    <li>Assigned tasks and responsibilities to a small team members, optimizing team performance and increasing productivity by 30%.</li>
+                                    <li>Resolved over 50 support tickets per month, reducing average resolution time by 35% using advanced troubleshooting techniques.</li>
+                                </ul>
+                            </div>
+                            <div class="relative pl-8 border-l-2 border-blue-500/30">
+                                <div class="absolute -left-2 top-0 w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-600"></div>
+                                <h3 class="text-xl font-semibold">Social Media Designer (Freelance)</h3>
+                                <p class="text-blue-400 mb-3">PT Rocker Technology Innovation • 2023 - 2025</p>
+                                <ul class="list-disc pl-5 text-gray-300 space-y-2">
+                                    <li>Created daily Instagram designs for over 30 clients, ensuring alignment with their preferences and brand identity.</li>
+                                    <li>Conducted Google Meet sessions with clients for content briefings, enhancing communication and understanding.</li>
+                                    <li>Provided daily reports to the social media team, contributing to a 15% increase in team efficiency and strategy effectiveness.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="card p-6 rounded-lg shadow-lg">
+                        <h2 class="section-title text-2xl font-bold mb-6">Education</h2>
+                        <div class="relative pl-8 border-l-2 border-blue-500/30">
+                            <div class="absolute -left-2 top-0 w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-600"></div>
+                            <h3 class="text-xl font-semibold">Bachelor of Information Systems</h3>
+                            <p class="text-blue-400">Universitas Terbuka • 2020 - 2024</p>
+                            <p class="text-gray-300 mt-1">GPA : 3.56/4.00</p>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="space-y-8">
+                    <section class="card p-6 rounded-lg shadow-lg">
+                        <h2 class="section-title text-2xl font-bold mb-6">Contact</h2>
+                        <div class="space-y-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                                    <i class="fas fa-envelope text-white"></i>
+                                </div>
+                                <p>refnaldyivanka@gmail.com</p>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                                    <i class="fas fa-phone text-white"></i>
+                                </div>
+                                <p>+6288802432402</p>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                                    <i class="fas fa-map-marker-alt text-white"></i>
+                                </div>
+                                <p>Depok, West Java</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="card p-6 rounded-lg shadow-lg">
+                        <h2 class="section-title text-2xl font-bold mb-6">Skills</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <p class="font-medium mb-1">Networking</p>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 80%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="font-medium mb-1">Troubleshooting</p>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 90%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="font-medium mb-1">Graphic Design</p>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 80%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="font-medium mb-1">Programming</p>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 60%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="card p-6 rounded-lg shadow-lg">
+                        <h2 class="section-title text-2xl font-bold mb-6">Languages</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <p class="font-medium mb-1">Indonesia</p>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 100%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="font-medium mb-1">English</p>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 70%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="font-medium mb-1">Japanese</p>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 30%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+
+        <!-- Portfolio Mode (Hidden by default) -->
+        <div id="portfolioMode" class="hidden">
+            <header class="text-center mb-12">
+                <h1 class="text-4xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">My Portfolio</h1>
+                <p class="text-xl text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 font-medium">Selected projects from recent years</p>
+            </header>
+
+            <div class="mb-8">
+                <div class="flex space-x-2 overflow-x-auto pb-4">
+                    <button class="filter-btn px-4 py-2 rounded-full active-filter text-white" data-filter="all">All</button>
+                    <button class="filter-btn px-4 py-2 rounded-full bg-gray-700 text-gray-200" data-filter="web">Web</button>
+                    <button class="filter-btn px-4 py-2 rounded-full bg-gray-700 text-gray-200" data-filter="network">Network</button>
+                    <button class="filter-btn px-4 py-2 rounded-full bg-gray-700 text-gray-200" data-filter="design">Design</button>
+                </div>
+            </div>
+
+            <div class="portfolio-grid">
+                <!-- Portfolio Item 1 -->
+                <div class="portfolio-item" data-category="network">
+                    <img src="https://source.unsplash.com/random/600x400/?network" alt="Network Project" class="w-full h-64 object-cover">
+                    <div class="portfolio-overlay">
+                        <h3 class="text-white text-xl font-bold mb-2">Network Infrastructure</h3>
+                        <p class="text-gray-300 text-center px-4">Designed and implemented secure network infrastructure for enterprise clients</p>
+                        <div class="mt-4 flex space-x-2">
+                            <a href="#" class="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded hover:shadow-lg transition-all">View Project</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Portfolio Item 2 -->
+                <div class="portfolio-item" data-category="web">
+                    <img src="https://source.unsplash.com/random/600x400/?dashboard" alt="Dashboard Project" class="w-full h-64 object-cover">
+                    <div class="portfolio-overlay">
+                        <h3 class="text-white text-xl font-bold mb-2">IT Support Dashboard</h3>
+                        <p class="text-gray-300 text-center px-4">Custom dashboard for tracking and managing support tickets</p>
+                        <div class="mt-4 flex space-x-2">
+                            <a href="#" class="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded hover:shadow-lg transition-all">View Project</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Portfolio Item 3 -->
+                <div class="portfolio-item" data-category="design">
+                    <img src="https://source.unsplash.com/random/600x400/?branding" alt="Design Project" class="w-full h-64 object-cover">
+                    <div class="portfolio-overlay">
+                        <h3 class="text-white text-xl font-bold mb-2">Brand Identity</h3>
+                        <p class="text-gray-300 text-center px-4">Complete branding package for tech startup</p>
+                        <div class="mt-4 flex space-x-2">
+                            <a href="#" class="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded hover:shadow-lg transition-all">View Project</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Portfolio Item 4 -->
+                <div class="portfolio-item" data-category="network">
+                    <img src="https://source.unsplash.com/random/600x400/?server" alt="Server Project" class="w-full h-64 object-cover">
+                    <div class="portfolio-overlay">
+                        <h3 class="text-white text-xl font-bold mb-2">Server Configuration</h3>
+                        <p class="text-gray-300 text-center px-4">Optimized server setup for high availability and performance</p>
+                        <div class="mt-4 flex space-x-2">
+                            <a href="#" class="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded hover:shadow-lg transition-all">View Project</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Portfolio Item 5 -->
+                <div class="portfolio-item" data-category="design">
+                    <img src="https://source.unsplash.com/random/600x400/?socialmedia" alt="Social Media Project" class="w-full h-64 object-cover">
+                    <div class="portfolio-overlay">
+                        <h3 class="text-white text-xl font-bold mb-2">Social Media Campaign</h3>
+                        <p class="text-gray-300 text-center px-4">Complete visual identity for social media marketing campaign</p>
+                        <div class="mt-4 flex space-x-2">
+                            <a href="#" class="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded hover:shadow-lg transition-all">View Project</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Portfolio Item 6 -->
+                <div class="portfolio-item" data-category="web">
+                    <img src="https://source.unsplash.com/random/600x400/?helpdesk" alt="Helpdesk Project" class="w-full h-64 object-cover">
+                    <div class="portfolio-overlay">
+                        <h3 class="text-white text-xl font-bold mb-2">Helpdesk Portal</h3>
+                        <p class="text-gray-300 text-center px-4">User-friendly interface for IT support ticket system</p>
+                        <div class="mt-4 flex space-x-2">
+                            <a href="#" class="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded hover:shadow-lg transition-all">View Project</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Particles.js -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // Initialize particles.js
+        document.addEventListener('DOMContentLoaded', function() {
+            particlesJS('particles-js', {
+                "particles": {
+                    "number": {
+                        "value": 80,
+                        "density": {
+                            "enable": true,
+                            "value_area": 800
+                        }
+                    },
+                    "color": {
+                        "value": "#3b82f6"
+                    },
+                    "shape": {
+                        "type": "circle",
+                        "stroke": {
+                            "width": 0,
+                            "color": "#000000"
+                        },
+                        "polygon": {
+                            "nb_sides": 5
+                        }
+                    },
+                    "opacity": {
+                        "value": 0.5,
+                        "random": true,
+                        "anim": {
+                            "enable": true,
+                            "speed": 1,
+                            "opacity_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "size": {
+                        "value": 3,
+                        "random": true,
+                        "anim": {
+                            "enable": true,
+                            "speed": 2,
+                            "size_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "line_linked": {
+                        "enable": true,
+                        "distance": 150,
+                        "color": "#3b82f6",
+                        "opacity": 0.4,
+                        "width": 1
+                    },
+                    "move": {
+                        "enable": true,
+                        "speed": 1,
+                        "direction": "none",
+                        "random": true,
+                        "straight": false,
+                        "out_mode": "out",
+                        "bounce": false,
+                        "attract": {
+                            "enable": true,
+                            "rotateX": 600,
+                            "rotateY": 1200
+                        }
+                    }
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": {
+                        "onhover": {
+                            "enable": true,
+                            "mode": "grab"
+                        },
+                        "onclick": {
+                            "enable": true,
+                            "mode": "push"
+                        },
+                        "resize": true
+                    },
+                    "modes": {
+                        "grab": {
+                            "distance": 140,
+                            "line_linked": {
+                                "opacity": 1
+                            }
+                        },
+                        "bubble": {
+                            "distance": 400,
+                            "size": 40,
+                            "duration": 2,
+                            "opacity": 8,
+                            "speed": 3
+                        },
+                        "repulse": {
+                            "distance": 200,
+                            "duration": 0.4
+                        },
+                        "push": {
+                            "particles_nb": 4
+                        },
+                        "remove": {
+                            "particles_nb": 2
+                        }
+                    }
+                },
+                "retina_detect": true
+            });
+        });
+
+        // CV/Portfolio Mode Toggle
+        const viewToggle = document.getElementById('viewToggle');
+        const viewText = document.getElementById('viewText');
+        const cvMode = document.getElementById('cvMode');
+        const portfolioMode = document.getElementById('portfolioMode');
+        
+        viewToggle.addEventListener('click', () => {
+            cvMode.classList.toggle('hidden');
+            portfolioMode.classList.toggle('hidden');
+            
+            if (portfolioMode.classList.contains('hidden')) {
+                viewText.textContent = 'Portfolio Mode';
+                viewToggle.classList.remove('bg-gray-500');
+                viewToggle.classList.add('bg-gradient-to-r', 'from-blue-500', 'to-purple-600');
+            } else {
+                viewText.textContent = 'CV Mode';
+                viewToggle.classList.remove('bg-gradient-to-r', 'from-blue-500', 'to-purple-600');
+                viewToggle.classList.add('bg-gray-500');
+            }
+        });
+
+        // Portfolio Filter
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Update active button
+                filterButtons.forEach(btn => {
+                    btn.classList.remove('active-filter');
+                    btn.classList.add('bg-gray-700');
+                });
+                
+                button.classList.add('active-filter');
+                button.classList.remove('bg-gray-700');
+                
+                // Filter items
+                const filter = button.getAttribute('data-filter');
+                const items = document.querySelectorAll('.portfolio-item');
+                
+                items.forEach(item => {
+                    if (filter === 'all' || item.getAttribute('data-category') === filter) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Animate skill bars on scroll
+        const animateSkillBars = () => {
+            const skillBars = document.querySelectorAll('.skill-progress');
+            skillBars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 100);
+            });
+        };
+
+        // Check if skills section is in view
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateSkillBars();
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {threshold: 0.1});
+
+        const skillsSection = document.querySelector('#cvMode');
+        if (skillsSection) {
+            observer.observe(skillsSection);
+        }
+    </script>
+<p style="border-radius: 8px; text-align: center; font-size: 12px; color: #fff; margin-top: 16px;position: fixed; left: 8px; bottom: 8px; z-index: 10; background: rgba(0, 0, 0, 0.8); padding: 4px 8px;">Made with <img src="https://enzostvs-deepsite.hf.space/logo.svg" alt="DeepSite Logo" style="width: 16px; height: 16px; vertical-align: middle;display:inline-block;margin-right:3px;filter:brightness(0) invert(1);"><a href="https://enzostvs-deepsite.hf.space" style="color: #fff;text-decoration: underline;" target="_blank" >DeepSite</a> - 🧬 <a href="https://enzostvs-deepsite.hf.space?remix=salvoshka/cvfix" style="color: #fff;text-decoration: underline;" target="_blank" >Remix</a></p></body>
 </html>
